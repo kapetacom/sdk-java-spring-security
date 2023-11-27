@@ -1,6 +1,6 @@
-# Kapeta Spring Boot SDK
+# Kapeta Spring Security SDK
 
-Java SDK using Spring Boot for interacting with Kapeta Runtime
+Java SDK using Spring Boot Security for adding security to projects with Kapeta Runtime
 
 ## License
 
