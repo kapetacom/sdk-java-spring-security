@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Kapeta Inc.
+ * SPDX-License-Identifier: MIT
+ */
+
 package com.kapeta.spring.rest;
 
 import com.kapeta.spring.dto.KapetaAuthenticationMetadata;
