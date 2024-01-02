@@ -21,9 +21,9 @@ public class KapetaSecurityProviderConfig {
     @Bean
     public SecurityFilterChain kapetaFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/.kapeta/**")
+                .securityMatcher(KapetaAuthenticationRestController.PATH_KAPETA_AUTHENTICATION)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/.kapeta/**").permitAll()
+                        .requestMatchers(KapetaAuthenticationRestController.PATH_KAPETA_AUTHENTICATION).permitAll()
                         .anyRequest().authenticated()
                 );
         return http.build();
