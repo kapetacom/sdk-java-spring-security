@@ -5,8 +5,8 @@
 
 package com.kapeta.spring.config;
 
+import com.kapeta.spring.rest.KapetaAuthenticationRestController;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,7 +16,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@ComponentScan("com.kapeta.spring.rest")
 public class KapetaSecurityProviderConfig {
 
     @Bean
@@ -28,5 +27,10 @@ public class KapetaSecurityProviderConfig {
                         .anyRequest().authenticated()
                 );
         return http.build();
+    }
+
+    @Bean
+    public KapetaAuthenticationRestController kapetaAuthenticationRestController() {
+        return new KapetaAuthenticationRestController();
     }
 }
