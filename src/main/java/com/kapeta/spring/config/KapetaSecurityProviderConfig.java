@@ -13,7 +13,6 @@ import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,7 +35,6 @@ public class KapetaSecurityProviderConfig {
                 .securityMatcher(KapetaAuthenticationRestController.PATH_KAPETA_AUTHENTICATION)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(KapetaAuthenticationRestController.PATH_KAPETA_AUTHENTICATION).permitAll()
-                        .anyRequest().authenticated()
                 );
 
         return http.build();
@@ -54,26 +52,25 @@ public class KapetaSecurityProviderConfig {
     }
 
     @Bean
-    public KapetaAuthenticationRestController kapetaAuthenticationRestController(@Value("${kapeta.authentication.issuer:#{null}}") String issuer,
-                                                                                 @Value("${kapeta.authentication.audience:#{null}}") String audience) {
-        return new KapetaAuthenticationRestController(issuer, audience);
+    public KapetaAuthenticationRestController kapetaAuthenticationRestController(JWKInternalKeyStoreProvider jwkInternalKeyStoreProvider) {
+        return new KapetaAuthenticationRestController(jwkInternalKeyStoreProvider);
     }
 
     @Bean
-    public KapetaJwksRestController kapetaJwksRestController(JWKPublicKeySetProvider jwkPublicKeySetProvider) {
-        return new KapetaJwksRestController(jwkPublicKeySetProvider);
+    public KapetaJwksRestController kapetaJwksRestController(JWKInternalKeyStoreProvider jwkInternalKeyStoreProvider) {
+        return new KapetaJwksRestController(jwkInternalKeyStoreProvider);
     }
 
     @Bean
-    @ConditionalOnMissingBean(JWKPublicKeySetProvider.class)
-    public JWKPublicKeySetProvider jwksPublicKeyProvider() {
+    @ConditionalOnMissingBean(JWKInternalKeyStoreProvider.class)
+    public JWKInternalKeyStoreProvider jwksPublicKeyProvider() {
         log.info("Creating JWKS Public Key");
         try {
             RSAKey jwk = new RSAKeyGenerator(2048)
                     .keyUse(KeyUse.SIGNATURE)
                     .keyID(UUID.randomUUID().toString())
-                    .generate().toPublicJWK();
-            return () -> new JWKSet(jwk);
+                    .generate();
+            return () -> new JWKInternalKeyStore("https://auth.kapeta", "https://auth.kapeta", new JWKSet(jwk));
         } catch (JOSEException e) {
             throw new RuntimeException(e);
         }
