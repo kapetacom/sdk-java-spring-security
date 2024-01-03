@@ -70,7 +70,7 @@ public class KapetaSecurityProviderConfig {
                     .keyUse(KeyUse.SIGNATURE)
                     .keyID(UUID.randomUUID().toString())
                     .generate();
-            return () -> new JWKInternalKeyStore("https://auth.kapeta", "https://auth.kapeta", new JWKSet(jwk));
+            return () -> new JWKInternalKeyStore("https://example.auth.kapeta.com", "https://example.kapeta.com", new JWKSet(jwk));
         } catch (JOSEException e) {
             throw new RuntimeException(e);
         }
