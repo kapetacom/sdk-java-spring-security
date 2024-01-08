@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.kapeta.spring.config;
+package com.kapeta.spring.security.dto;
 
-import com.nimbusds.jose.jwk.JWKSet;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,8 +12,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class JWKInternalKeyStore {
+public class KapetaAuthenticationMetadata {
+    private String type;
+    private String jwks;
     private String issuer;
-    private String audience;
-    private JWKSet keyStore;
+    private String[] audience;
 }
