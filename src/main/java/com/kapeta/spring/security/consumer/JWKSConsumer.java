@@ -1,58 +1,47 @@
 /*
- * Copyright 2024 Kapeta Inc.
+ * Copyright 2023 Kapeta Inc.
  * SPDX-License-Identifier: MIT
  */
-
-package com.kapeta.spring.config;
+package com.kapeta.spring.security.consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.kapeta.spring.dto.KapetaAuthenticationMetadata;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.web.SecurityFilterChain;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kapeta.spring.config.providers.KapetaConfigurationProvider;
+import com.kapeta.spring.security.dto.KapetaAuthenticationMetadata;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kapeta.spring.config.providers.KapetaConfigurationProvider;
-
-@Configuration
-@EnableWebSecurity
-@EnableMethodSecurity
-public class KapetaSecurityConsumerConfig {
+@Slf4j
+public class JWKSConsumer {
+    private static final String SERVICE_NAME = "authjwtconsumer";
+    private static final String SERVICE_PORT = "http";
 
     public static final String PATH_KAPETA_AUTHENTICATION = "/.kapeta/authentication.json";
 
     private final KapetaConfigurationProvider kapetaConfigurationProvider;
     private final ObjectMapper objectMapper;
 
-    public KapetaSecurityConsumerConfig(KapetaConfigurationProvider kapetaConfigurationProvider, ObjectMapper objectMapper) {
+    public JWKSConsumer(KapetaConfigurationProvider kapetaConfigurationProvider, ObjectMapper objectMapper) {
         this.kapetaConfigurationProvider = kapetaConfigurationProvider;
         this.objectMapper = objectMapper;
     }
 
-    @Bean
-    public SecurityFilterChain oauthResourceServerFilterChain(HttpSecurity http) throws Exception {
-        String baseUrl = kapetaConfigurationProvider.getServiceAddress("authjwtconsumer", "http");
+    public String getJwksUri() {
+        String baseUrl = kapetaConfigurationProvider.getServiceAddress(SERVICE_NAME, SERVICE_PORT);
         while (baseUrl != null && baseUrl.endsWith("/")) {
             baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
         }
 
         String url = baseUrl + PATH_KAPETA_AUTHENTICATION;
+        log.info("Fetching authentication metadata from {}", url);
         KapetaAuthenticationMetadata kapetaAuthenticationMetadata = fetchAndUnmarshal(url);
-        String jwkSetUri = baseUrl + kapetaAuthenticationMetadata.getJwks();
-
-        http
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.jwkSetUri(jwkSetUri))
-                );
-        return http.build();
+        var jwksUri = baseUrl + kapetaAuthenticationMetadata.getJwks();
+        log.info("Resolved JWKS URI {}", jwksUri);
+        return jwksUri;
     }
 
     private KapetaAuthenticationMetadata fetchAndUnmarshal(String url) {

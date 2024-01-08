@@ -5,7 +5,8 @@
 
 package com.kapeta.spring.annotation;
 
-import com.kapeta.spring.config.KapetaSecurityProviderConfig;
+import com.kapeta.spring.security.provider.JWKSProviderConfiguration;
+import com.kapeta.spring.security.OpenAPIConfiguration;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -14,6 +15,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@Import({KapetaSecurityProviderConfig.class})
+@Import({JWKSProviderConfiguration.class, OpenAPIConfiguration.class})
 public @interface KapetaEnableSecurityProviderConfig {
 }
