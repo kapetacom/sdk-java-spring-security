@@ -1,3 +1,7 @@
+/*
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: MIT
+ */
 package com.kapeta.spring.security.consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
