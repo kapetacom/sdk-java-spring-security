@@ -4,6 +4,7 @@
  */
 package com.kapeta.spring.security;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -20,6 +21,7 @@ public class JWTSecurityContext implements Supplier<Jwt> {
      */
     public Jwt get() {
         SecurityContext context = SecurityContextHolder.getContext();
-        return (Jwt) context.getAuthentication().getPrincipal();
+        Authentication authentication = context.getAuthentication();
+        return authentication == null ? null :(Jwt) authentication.getPrincipal();
     }
 }
