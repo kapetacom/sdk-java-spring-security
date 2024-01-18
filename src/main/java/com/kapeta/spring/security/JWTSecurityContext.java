@@ -22,6 +22,15 @@ public class JWTSecurityContext implements Supplier<Jwt> {
     public Jwt get() {
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication authentication = context.getAuthentication();
-        return authentication == null ? null :(Jwt) authentication.getPrincipal();
+        if (authentication == null) {
+            return null;
+        }
+
+        // if the user is anonymous principal is not Jwt.
+        if (authentication.getPrincipal() instanceof Jwt) {
+            return (Jwt) authentication.getPrincipal();
+        }
+
+        return null;
     }
 }
