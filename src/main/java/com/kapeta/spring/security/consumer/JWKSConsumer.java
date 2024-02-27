@@ -9,6 +9,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kapeta.spring.config.providers.KapetaConfigurationProvider;
 import com.kapeta.spring.security.dto.KapetaAuthenticationMetadata;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.backoff.FixedBackOffPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -45,7 +48,7 @@ public class JWKSConsumer {
     }
 
     private KapetaAuthenticationMetadata fetchAndUnmarshal(String url) {
-        String authenticationJson = fetch(url);
+        String authenticationJson = fetchWithRetry(url);
         try {
             return objectMapper.readValue(authenticationJson, KapetaAuthenticationMetadata.class);
         } catch (JsonProcessingException e) {
@@ -53,7 +56,18 @@ public class JWKSConsumer {
         }
     }
 
+    private String fetchWithRetry(String url) {
+        RetryTemplate retryTemplate = new RetryTemplate();
+        SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy(Integer.MAX_VALUE);
+        FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
+        backOffPolicy.setBackOffPeriod(2000);
+        retryTemplate.setRetryPolicy(retryPolicy);
+        retryTemplate.setBackOffPolicy(backOffPolicy);
+        return retryTemplate.execute(context -> fetch(url));
+    }
+
     private String fetch(String url) {
+        log.info("Fetching authentication metadata from {}", url);
         HttpURLConnection connection = null;
         try {
             connection = (HttpURLConnection) new URL(url).openConnection();
