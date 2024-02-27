@@ -7,7 +7,7 @@
     <groupId>com.kapeta</groupId>
     <artifactId>spring-security</artifactId>
     <packaging>jar</packaging>
-    <version>0.2.2</version>
+    <version>0.2.3</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Kapeta Spring Boot Security SDK</description>
@@ -169,6 +169,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
         </dependency>
 
         <dependency>
